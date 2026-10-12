@@ -1,0 +1,29 @@
+{
+  "head_object": "Head",
+  "materials": {"skin": "face_skin", "eyeL": "face_eyeL", "eyeR": "face_eyeR", "mouth": "face_mouth"},
+  "eye_grid": 3,
+  "mouth_grid": 6,
+  "face_mtoon": {
+    "base_color": [0.94, 0.90, 0.88, 1.0],
+    "shade_color": [0.90, 0.74, 0.70],
+    "shading_shift": -0.05,
+    "shading_toony": 0.9,
+    "gi_equalization": 0.15
+  },
+  "expressions": {
+    "blink":       {"morph": ["blink"],       "tt": {"eyeL": [1, 0], "eyeR": [1, 0]}},
+    "blink_left":  {"morph": ["blinkLeft"],   "tt": {"eyeL": [1, 0]}},
+    "blink_right": {"morph": ["blinkRight"],  "tt": {"eyeR": [1, 0]}},
+    "aa": {"morph": ["aa"], "tt": {"mouth": [1, 0]}},
+    "ih": {"morph": ["ih"], "tt": {"mouth": [2, 0]}},
+    "ou": {"morph": ["ou"], "tt": {"mouth": [3, 0]}},
+    "ee": {"morph": ["ee"], "tt": {"mouth": [4, 0]}},
+    "oh": {"morph": ["oh"], "tt": {"mouth": [5, 0]}},
+    "happy":     {"morph": ["happy_eyes", "happy_mouth"],         "tt": {"eyeL": [2, 0], "eyeR": [2, 0], "mouth": [0, 1]}, "emotion": true},
+    "angry":     {"morph": ["angry_eyes", "angry_mouth"],         "tt": {"eyeL": [0, 1], "eyeR": [0, 1], "mouth": [0, 2]}, "emotion": true},
+    "sad":       {"morph": ["sad_eyes", "sad_mouth"],             "tt": {"eyeL": [1, 1], "eyeR": [1, 1], "mouth": [0, 3]}, "emotion": true},
+    "surprised": {"morph": ["surprised_eyes", "surprised_mouth"], "tt": {"eyeL": [2, 1], "eyeR": [2, 1], "mouth": [0, 4]}, "emotion": true},
+    "relaxed":   {"morph": ["relaxed_eyes", "relaxed_mouth"],     "tt": {"eyeL": [0, 2], "eyeR": [0, 2], "mouth": [0, 5]}, "emotion": true}
+  },
+  "_note": "tt values are tile coordinates [column, row] (glTF UV: origin top-left, v down). Offset = tile / grid. Morph names that do not exist on the mesh are skipped with a warning."
+}
