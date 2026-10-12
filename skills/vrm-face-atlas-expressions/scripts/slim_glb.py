@@ -2,8 +2,10 @@
 
     python slim_glb.py in.vrm out.vrm [--no-sparse] [--no-weights] [--keep-emissive]
 
-  * emissiveFactor -> 0 on materials without an emissive texture (Blender MToon export can write (1,1,1),
-    which makes faces glow white in three-vrm)
+  * emissiveFactor -> 0 on materials without an emissive texture (Blender MToon export writes (1,1,1) together with
+    KHR_materials_emissive_strength = 0; harmless in three.js but white in loaders that ignore the strength extension)
+  * materials that keep an emissive (--keep-emissive or an emissive texture) get emissiveStrength >= 1
+    (the exported 0 would silently switch the glow off)
   * VRMC_materials_mtoon.matcapFactor -> [0,0,0] when no matcap texture (spec default is white)
   * every texture gets a mipmapped sampler (min LINEAR_MIPMAP_LINEAR, mag LINEAR, repeat)
   * drops accessors nothing references (e.g. exported-but-unused shape-key normals)
@@ -31,6 +33,11 @@ report = {}
 for m in j.get("materials", []):
     if ZERO_EMI and "emissiveTexture" not in m and m.get("emissiveFactor", [0, 0, 0]) != [0, 0, 0]:
         m["emissiveFactor"] = [0.0, 0.0, 0.0]; report.setdefault("emissive_zeroed", []).append(m.get("name"))
+    # Blender's VRM export writes KHR_materials_emissive_strength = Blender "Emission Strength" (0 for converted
+    # materials). Any material that should glow needs strength >= 1, otherwise three.js multiplies emissive by 0.
+    es = m.get("extensions", {}).get("KHR_materials_emissive_strength")
+    if es is not None and max(m.get("emissiveFactor", [0, 0, 0])) > 0 and es.get("emissiveStrength", 1.0) < 1.0:
+        es["emissiveStrength"] = 1.0; report.setdefault("emissive_strength_fixed", []).append(m.get("name"))
     e = m.get("extensions", {}).get("VRMC_materials_mtoon")
     if e is not None and "matcapTexture" not in e:
         e["matcapFactor"] = [0.0, 0.0, 0.0]

@@ -140,7 +140,10 @@ VRM 0.x（UniVRM）で使う場合は Material Value Bind `_MainTex_ST` = (1, 1,
       （`scripts/render_combo_check.py` → `scripts/make_grid.py`）
 - [ ] **コマ送りで拡大**：切り替わりの瞬間、まつ毛のはみ出し、閉じ目の「板」、45° で奥の目がまぶたの外に出ていないか
 - [ ] **ミップマップ**：サンプラーの minFilter = LINEAR_MIPMAP_LINEAR（9987）。引きの絵で隣タイルの色が出ないか
-- [ ] **emissiveFactor = 0**：Blender の MToon 変換は emissive を (1,1,1) で書き出すことがある → three-vrm で顔が真っ白に光る。必ず 0 に
+- [ ] **emissive を揃える**：Blender（VRM Add-on）の書き出しは、MToon に変換した素材で emissiveFactor = (1,1,1) と
+      `KHR_materials_emissive_strength` = 0（Blender の「放射の強さ」）を一緒に書く。three.js / three-vrm は強さ 0 を掛けるので
+      見た目は光らないが、強さ拡張を読まないツールでは真っ白に光る。**光らせない素材は emissiveFactor = 0 に揃える**。
+      逆に**わざと光らせる素材（夜でも黒つぶれしない等）は emissiveStrength を 1 以上に**しないと、何をしても光らない
 - [ ] **全マテリアル MToon・不透明**、マットキャップ未使用なら matcapFactor = (0,0,0) を明示（仕様の既定値は白）
 - [ ] **lookAt の offsetFromHeadBone** が VRM の軸（x, 上, 前）で目の位置になっているか（Blender の座標のまま入れると目より下を向く）
 - [ ] **サムネイル**（meta の thumbnailImage）が入っているか
@@ -161,8 +164,12 @@ VRM 0.x（UniVRM）で使う場合は Material Value Bind `_MainTex_ST` = (1, 1,
 
 ## 9. スタジオ（強い照明）でのつまずき
 
-- **顔が白飛び**：まず emissive を疑う（§7）。次に、顔の 4 マテリアルの MToon パラメータ（陰の色・shadingShift・toony・GI・rim）が
-  **全部同じか**。違うと、影に入ったときに目や口の範囲だけ四角いブロックになる。
+- **顔の目や口だけ四角いブロックになる**：顔の 4 マテリアルの MToon パラメータ（陰の色・shadingShift・toony・GI・rim）が
+  **全部同じか**を確認。違うと、影に入ったときに目や口の範囲だけ色が変わる。
+- **顔が白っぽい**：強いライトでは baseColor がそのまま飛ぶ。頭の baseColor を少し下げて暖色寄りに、陰の色も肌色寄りに（下の項目）。
+  emissive の値も確認する（§7。three.js では強さ 0 なら影響しないが、他のツールでは白く光ることがある）。
+- **暗い場所で真っ黒になる**（環境光の弱いアプリ）：縁の光（parametricRim）と、色の絵を使ったごく弱い自己発光
+  （emissiveTexture = 色の絵、emissiveFactor 0.1 前後、**emissiveStrength 1**）が効く。
 - **アプリ側の「マテリアル名で補正をかけるルール」**（例：名前に `_SKIN` が入るものだけ陰を濃くする）は、
   4 つの顔マテリアル全部に当たるか、どれにも当たらないかにする。1つだけ当たると段差が出る。
 - 頭の色は暖色寄りに（baseColor を少しだけ下げて暖かく、陰の色も肌色に近く）すると、強いライトでも「肌」に見える。
